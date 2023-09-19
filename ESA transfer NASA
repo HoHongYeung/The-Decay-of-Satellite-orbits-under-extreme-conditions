@@ -1,0 +1,38 @@
+import cdflib
+import pandas as pd
+from datetime import datetime
+
+# 打开CDF文件
+cdf_file = cdflib.CDF('SW_OPER_DNSAPOD_2__20230327T000000_20230327T235930_0201.cdf')
+
+# 获取时间列数据
+time_data = cdf_file.varget(0)  # 假设时间数据在第一个变量中
+
+# 获取其他列数据
+other_data1 = cdf_file.varget(1)  # 假设其他列数据在第二个变量中
+other_data2 = cdf_file.varget(2)  # 假设其他列数据在第三个变量中
+other_data3 = cdf_file.varget(3)  # 假设其他列数据在第二个变量中
+other_data4 = cdf_file.varget(4)  # 假设其他列数据在第三个变量中
+other_data5 = cdf_file.varget(5)  # 假设其他列数据在第三个变量中
+other_data6 = cdf_file.varget(6)  # 假设其他列数据在第二个变量中
+other_data7 = cdf_file.varget(7)  # 假设其他列数据在第三个变量中
+# 转换时间数据为ISO 8601格式并与其他列数据一起保存
+output_data = []
+for i, cdf_epoch in enumerate(time_data):
+    cdf_time = cdflib.cdfepoch.breakdown(cdf_epoch)
+    iso8601 = datetime(*cdf_time[:6]).isoformat()
+    other1 = str(other_data1[i])  # 转换为字符串类型
+    other2 = str(other_data2[i])  # 转换为字符串类型
+    other3 = str(other_data1[i])  # 转换为字符串类型
+    other4 = str(other_data2[i])  # 转换为字符串类型
+    other5 = str(other_data1[i])  # 转换为字符串类型
+    other6 = str(other_data1[i])  # 转换为字符串类型
+    other7 = str(other_data2[i])  # 转换为字符串类型
+    output_data.append([iso8601, other1, other2, other3, other4, other5, other6, other7])
+
+# 导出到文本文件
+output_file = 'output_all.txt'
+with open(output_file, 'w') as file:
+    for row in output_data:
+        file.write(','.join(row) + '\n')
+
