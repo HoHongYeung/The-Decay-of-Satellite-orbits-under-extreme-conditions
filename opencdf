@@ -1,0 +1,22 @@
+import cdflib
+from datetime import datetime
+
+# 打开CDF文件
+cdf_file = cdflib.CDF('SW_OPER_DNSAPOD_2__20230327T000000_20230327T235930_0201.cdf')
+
+# 获取第一列时间数据
+time_data = cdf_file.varget(0)  # 假设时间数据在第一个变量中
+
+# 将CDF时间转换为ISO 8601格式的时间
+iso8601_time = []
+for cdf_epoch in time_data:
+    cdf_time = cdflib.cdfepoch.breakdown(cdf_epoch)
+    iso8601 = datetime(*cdf_time[:6]).isoformat()
+    iso8601_time.append(iso8601)
+
+# 导出到文本文件
+output_file = 'output.txt'
+with open(output_file, 'w') as file:
+    for time in iso8601_time:
+        file.write(time + '\n')
+
