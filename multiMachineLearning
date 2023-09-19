@@ -1,0 +1,58 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import SGDRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.tree import export_graphviz
+import pydotplus
+from IPython.display import Image
+import os
+import matplotlib.pyplot as plt
+os.environ['PATH'] += os.pathsep + 'D:/Graphviz/bin'  # 替换为你的GraphViz安装路径
+
+
+# 1. 读取数据集
+data = pd.read_csv('C:/Users/84525/Desktop/毕业论文/建模代码/finaldataset.csv')  # 替换为你的数据文件路径
+
+# 2. 划分特征和目标变量
+X = data[['Density_min-max', 'density_o_min-max', 'Kp_min-max','DSTIndex_min-max','Flag(***)_min-max','apindex_min-max','la_min-max','lo_min-max','local_solar_time_min-max']]
+y = data['Altitude_min-max']
+
+# 3. 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. 特征缩放
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# 5. 训练和评估四种模型（多种机器学习模型字典块model_name，models.items）
+models = {
+    'BP Neural Network': MLPRegressor(hidden_layer_sizes=(100, 100), max_iter=1000, random_state=42),
+    'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42),
+    'Decision Tree': DecisionTreeRegressor(random_state=42),
+    'Gradient Descent': SGDRegressor(random_state=42)
+}
+
+results = {}
+
+for model_name, model in models.items():
+    model.fit(X_train, y_train)  # Ensure proper indentation here
+    y_pred = model.predict(X_test)
+
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    mae = mean_absolute_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    # 计算皮尔逊系数
+    pearson_coefficient = np.corrcoef(y_pred, y_test)[0, 1]
+
+    results[model_name] = {'RMSE': rmse, 'MAE': mae, 'R-square': r2, 'Pearson Coefficient': pearson_coefficient}
+
+# 6. 输出性能指标和Precision
+for model_name, metrics in results.items():
+    print(f'Model:
