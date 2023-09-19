@@ -1,0 +1,43 @@
+import pandas as pd
+from sklearn.model_selection import cross_val_predict
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+# 从CSV文件中读取数据
+df = pd.read_csv('finaldataset.csv')  # 替换为你的数据文件路径
+
+# 划分数据集为训练集和测试集
+
+X = df[['Density_min-max', 'density_o_min-max', 'Kp_min-max','DSTIndex_min-max','Flag(***)_min-max','apindex_min-max','la_min-max','lo_min-max','local_solar_time_min-max']]
+y = df['Altitude_min-max']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 训练GLM模型
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 预测
+y_pred = model.predict(X_test)
+
+# 计算RMSE
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+print("Root Mean Squared Error:", rmse)
+
+# 获取拟合系数和截距
+coefficients = model.coef_
+intercept = model.intercept_
+
+# 输出拟合系数
+print("Coefficients:", coefficients)
+
+# 输出拟合函数方程
+equation = "Altitude = {:.4f} + {:.4f}*Density + {:.4f}*density_o + {:.4f}*Kp + {:.4f}*DSTIndex +{:.4f}*Flag(***) + {:.4f}*apindex +{:.4f}*la + {:.4f}*lo +{:.4f}*local_solar_time".format(
+    intercept, coefficients[0], coefficients[1], coefficients[2],coefficients[3],coefficients[4],coefficients[5],coefficients[6],coefficients[7],coefficients[8]
+)
+print("Fitted Equation:", equation)
+
+# 获取拟合优度（R-squared）
+r_squared = model.score(X_test, y_test)
+print("R-squared:", r_squared)
